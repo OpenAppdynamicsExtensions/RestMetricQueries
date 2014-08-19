@@ -22,7 +22,7 @@ import org.appdynamics.appdrestapi.RESTAccess;
 public class Main {
     public static void main(String[] args) {
 
-        RESTAccess a = new RESTAccess("controller3.demo.appdynamics.com","80",false,"demouser","apm13ad3r","customer1");
+        RESTAccess a = new RESTAccess("controller3.demo.appdynamics.com","80",false,"demouser","XXXX","customer1");
 
         try {
             MetricQuery mq = new MetricQuery();
