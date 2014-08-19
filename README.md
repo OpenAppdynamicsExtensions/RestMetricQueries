@@ -6,7 +6,7 @@ This is a nice and new way to query Metrics using a Query Language.
 
 Sample
 
-'''
+```
 package de.query.test;
 
 import de.appdynamics.ace.metric.query.data.DataMap;
@@ -41,4 +41,4 @@ public class Main {
 
     }
 }
-'''
+``` 
