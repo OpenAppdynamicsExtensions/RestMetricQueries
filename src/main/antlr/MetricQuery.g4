@@ -33,6 +33,7 @@ timeShiftingStatement returns [int value]:
                'starting' 'at' ansiDate    # absoluteTimerangeOffset
               | 'ending' 'at' ansiDate     # absoluteTimerangeOffset
               | 'starting' NUMBER_NO_LEADING_ZEROS TIME_UNIT 'ago' # relativeTimerangeOffset
+              | 'ending'? NUMBER_NO_LEADING_ZEROS TIME_UNIT 'ago' # relativeTimerangeOffset;
 
 
 fieldList: anyField

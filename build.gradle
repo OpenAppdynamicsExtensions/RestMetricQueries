@@ -105,7 +105,7 @@ task grun(type: JavaExec, dependsOn: compileJava) {
 test.testLogging { showStandardStreams = true }
 
 group = 'com.appdynamics.ace.restQuery'
-version = '0.1'
+version = '0.2'
 
 
 publishing {

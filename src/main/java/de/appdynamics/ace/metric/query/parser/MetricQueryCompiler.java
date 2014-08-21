@@ -220,11 +220,9 @@ public class MetricQueryCompiler extends MetricQueryBaseVisitor <String>{
     @Override
     public String visitRelativeTimerangeOffset(@NotNull MetricQueryParser.RelativeTimerangeOffsetContext ctx) {
 
-        System.out.println("--RELATIVE ");
         boolean starting = ctx.getText().startsWith("starting");
         long num = Long.parseLong(ctx.NUMBER_NO_LEADING_ZEROS().getText());
         String unit = ctx.TIME_UNIT().getText();
-        System.out.println("Starting:"+starting+"  "+num+" ("+unit+")");
         TimeshiftHelper th = peekStack(TimeshiftHelper.class);
 
         if (starting) {
@@ -238,7 +236,6 @@ public class MetricQueryCompiler extends MetricQueryBaseVisitor <String>{
 
     @Override
     public String visitAbsoluteTimerangeOffset(@NotNull MetricQueryParser.AbsoluteTimerangeOffsetContext ctx) {
-        System.out.println("--RELATIVE ");
         TimeshiftHelper th = peekStack(TimeshiftHelper.class);
 
         boolean starting = ctx.getText().startsWith("starting");

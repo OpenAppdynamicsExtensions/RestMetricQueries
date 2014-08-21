@@ -186,6 +186,7 @@ public class DataMap {
                     dr.setTextValue(metricNameCol,metricName);
                     dr.setTextValue (pathCol,path);
                     dr.setTimestampValue(timestampCol, new Date(m.getStartTimeInMillis()));
+
                     dr.setValue(value, m.getValue());
                     dr.setValue(max, m.getMax());
                     dr.setValue(min, m.getMin());
