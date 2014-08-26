@@ -1,4 +1,4 @@
-package de.appdynamics.ace.tools.printer;
+package de.appdynamics.ace.reporting.printer;
 
 import de.appdynamics.ace.metric.query.data.DataMap;
 import org.appdynamics.appdrestapi.RESTAccess;

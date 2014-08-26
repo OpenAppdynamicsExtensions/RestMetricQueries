@@ -1,4 +1,4 @@
-package de.appdynamics.ace.tools.printer;
+package de.appdynamics.ace.reporting.printer;
 
 import de.appdynamics.ace.metric.query.data.DataMap;
 import org.appdynamics.appdrestapi.RESTAccess;
@@ -18,6 +18,7 @@ public class TableDataPrinter implements DataPrinter {
         pw.print("Query: "+query+"\n");
         pw.print(dataS);
         pw.print("\n");
+
     }
 
     @Override

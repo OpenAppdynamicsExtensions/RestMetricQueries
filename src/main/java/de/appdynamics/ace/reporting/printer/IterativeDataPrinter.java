@@ -1,4 +1,4 @@
-package de.appdynamics.ace.tools.printer;
+package de.appdynamics.ace.reporting.printer;
 
 import de.appdynamics.ace.metric.query.data.Column;
 import de.appdynamics.ace.metric.query.data.DataMap;
@@ -48,7 +48,7 @@ public abstract class IterativeDataPrinter implements DataPrinter{
         printDataEnd(pw);
         printFooter(pw);
         
-        pw.close();
+
     }
 
     protected abstract void printDataRowStart(PrintWriter pw, int i);

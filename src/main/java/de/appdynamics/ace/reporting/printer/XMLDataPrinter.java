@@ -1,4 +1,7 @@
-package de.appdynamics.ace.tools.printer;
+package de.appdynamics.ace.reporting.printer;
+
+
+
 
 import de.appdynamics.ace.metric.query.data.Column;
 import de.appdynamics.ace.metric.query.data.DataRow;
@@ -57,10 +60,11 @@ public class XMLDataPrinter extends IterativeDataPrinter {
 
     @Override
     protected void printDataCell(PrintWriter pw, boolean first, DataRow r, Column c) {
-        pw.print("<DataField field=\""+c.getName()+"\" >");
-        pw.print(r.findData(c).getTextValue());
-        pw.print("</DataField>\n");
-
+        if (r.findData(c) != null) {
+            pw.print("<DataField field=\"" + c.getName() + "\" >");
+            pw.print(r.findData(c).getTextValue());
+            pw.print("</DataField>\n");
+        }
     }
 
     @Override

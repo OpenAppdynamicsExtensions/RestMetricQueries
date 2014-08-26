@@ -1,4 +1,4 @@
-package de.appdynamics.ace.tools.printer;
+package de.appdynamics.ace.reporting.printer;
 
 import de.appdynamics.ace.metric.query.data.*;
 
@@ -71,7 +71,7 @@ public class CSVDataPrinter extends IterativeDataPrinter {
             pw.print(_wrapper);
             pw.print(data.getTextValue());
             pw.print(_wrapper);
-        } else                 {
+        } else if (data != null)  {
             pw.print(_wrapper);
             pw.print(data.getTextValue());
             pw.print(_wrapper);
