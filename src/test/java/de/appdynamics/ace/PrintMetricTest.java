@@ -5,8 +5,9 @@ import de.appdynamics.ace.metric.query.parser.CompiledRestMetricQuery;
 import de.appdynamics.ace.metric.query.parser.MetricParserException;
 import de.appdynamics.ace.metric.query.parser.MetricQuery;
 import de.appdynamics.ace.metric.query.parser.QueryException;
+import de.appdynamics.ace.metric.query.rest.ControllerRestAccess;
 import de.appdynamics.ace.reporting.printer.*;
-import org.appdynamics.appdrestapi.RESTAccess;
+
 import org.junit.Test;
 
 import java.io.*;
@@ -17,16 +18,33 @@ import java.io.*;
 public class PrintMetricTest {
 
 
-    String q = "export  'Calls per Minute', 'Average Response Time (ms)' from " +
+    String q = "export aggregated  'Calls per Minute', 'Average Response Time (ms)' from " +
             "'Business Transaction Performance'." +
             "'Business Transactions'." +
-            "'Commerce'.*" +
+            "* as tier . * as transaction " +
             "on Application 'Bundy Online Shoes' for 5 minutes";
+
+    String q3 = "export aggregated * from 'Business Transaction Performance|Business Transactions|*|*' " +
+            "on Application 'Bundy Online Shoes' "+
+            "for 1 day" ;
 
 
     @Test
     public void testAggregatedWildcardQuery() throws MetricParserException, QueryException {
         executeQuery(q,new PrettyDataPrinter(),"Pretty");
+
+        ControllerRestAccess a = new ControllerRestAccess(TestConsts.DEMO_APPDYNAMICS_COM, "80", false, "demouser", "apm13ad3r", "customer1");
+
+        MetricQuery mq = new MetricQuery();
+        String query = "export aggregated * " +
+                "from \"Business Transaction Performance|Business Transactions|*|*\" " +
+                " on Application 'Bundy Online Shoes'\n" +
+                " for 2 days";
+
+        CompiledRestMetricQuery erg = mq.parse( query);
+        DataMap result = erg.execute(a);   // Work wih Data
+        CSVDataPrinter printer = new CSVDataPrinter(",", "\"");
+        printer.printData(query,a,result,System.out);      // Export as CSV
 
     }
     @Test
@@ -72,7 +90,8 @@ public class PrintMetricTest {
             }
         };
 
-        RESTAccess a = new RESTAccess("controller3.demo.appdynamics.com","80",false,"demouser","apm13ad3r","customer1");
+
+        ControllerRestAccess a = new ControllerRestAccess(TestConsts.DEMO_APPDYNAMICS_COM, "80", false, "demouser", "apm13ad3r", "customer1");
 
 
         DataMap data = erg.execute(a,printer.isRequireSimplified());

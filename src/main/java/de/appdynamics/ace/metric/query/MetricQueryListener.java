@@ -173,6 +173,17 @@ public interface MetricQueryListener extends ParseTreeListener {
 	void exitAbsoluteTimerangeOffset(@NotNull MetricQueryParser.AbsoluteTimerangeOffsetContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link MetricQueryParser#pathElementName}.
+	 * @param ctx the parse tree
+	 */
+	void enterPathElementName(@NotNull MetricQueryParser.PathElementNameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MetricQueryParser#pathElementName}.
+	 * @param ctx the parse tree
+	 */
+	void exitPathElementName(@NotNull MetricQueryParser.PathElementNameContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link MetricQueryParser#pathElement}.
 	 * @param ctx the parse tree
 	 */

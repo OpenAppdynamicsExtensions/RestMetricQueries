@@ -5,8 +5,8 @@ import de.appdynamics.ace.metric.query.parser.CompiledRestMetricQuery;
 import de.appdynamics.ace.metric.query.parser.MetricParserException;
 import de.appdynamics.ace.metric.query.parser.MetricQuery;
 import de.appdynamics.ace.metric.query.parser.QueryException;
-import junit.framework.TestCase;
-import org.appdynamics.appdrestapi.RESTAccess;
+
+import de.appdynamics.ace.metric.query.rest.ControllerRestAccess;
 import org.junit.Test;
 
 /**
@@ -20,8 +20,8 @@ public class RetrieveMetricTest  {
         String q = "export 'Calls per Minute' from " +
                 "'Business Transaction Performance'." +
                 "'Business Transactions'." +
-                "'E-Commerce'.'Checkout'" +
-                "on Application 'Acme Online Book Store' for 4 hours 1 day ago";
+                "'MovieSearchSite'.'/'" +
+                "on Application 'Movie Tickets Online' for 4 hours 1 day ago";
 
         DataMap m = executeQuery(q,true);
        
@@ -32,8 +32,8 @@ public class RetrieveMetricTest  {
         String q = "export * from " +
                 "'Business Transaction Performance'." +
                 "'Business Transactions'." +
-                "'E-Commerce'.'Checkout'" +
-                "on Application 'Acme Online Book Store'";
+                "'MovieSearchSite'.'/'" +
+                "on Application 'Movie Tickets Online'";
 
         DataMap m = executeQuery(q,false);
 
@@ -44,8 +44,8 @@ public class RetrieveMetricTest  {
         String q = "export aggregated * from " +
                 "'Business Transaction Performance'." +
                 "'Business Transactions'." +
-                "'E-Commerce'.'Checkout'" +
-                "on Application 'Acme Online Book Store'";
+                "'MovieSearchSite'.'/'" +
+                "on Application 'Movie Tickets Online'";
 
 
 
@@ -59,9 +59,10 @@ public class RetrieveMetricTest  {
 
         CompiledRestMetricQuery erg = mq.parse( query);
 
-        RESTAccess a = new RESTAccess("controller3.demo.appdynamics.com","80",false,"demouser","apm13ad3r","customer1");
+        ControllerRestAccess a = new ControllerRestAccess(TestConsts.DEMO_APPDYNAMICS_COM, "80", false, "demouser", "apm13ad3r", "customer1");
 
 
+        erg.setIncludeEmptyRecords(true);
         DataMap data = erg.execute(a,condensed);
         System.out.println("DATA:" + data.dumpData());
         data.getHeader();

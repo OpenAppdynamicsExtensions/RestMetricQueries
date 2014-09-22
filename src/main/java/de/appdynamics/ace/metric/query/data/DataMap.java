@@ -1,10 +1,11 @@
 package de.appdynamics.ace.metric.query.data;
 
+import de.appdynamics.ace.metric.query.parser.CompiledRestMetricQuery;
+import de.appdynamics.ace.metric.query.rest.MetricData;
+import de.appdynamics.ace.metric.query.rest.MetricResults;
+import de.appdynamics.ace.metric.query.rest.MetricValue;
 import org.apache.commons.lang3.StringUtils ;
-import org.appdynamics.appdrestapi.data.MetricData;
-import org.appdynamics.appdrestapi.data.MetricDatas;
-import org.appdynamics.appdrestapi.data.MetricValue;
-import org.appdynamics.appdrestapi.data.MetricValues;
+
 
 import javax.xml.soap.Text;
 import java.util.*;
@@ -33,8 +34,8 @@ public class DataMap {
     }
 
 
-    public void registerData(MetricDatas tempData) {
-        ArrayList<MetricData> data = tempData.getMetric_data();
+    public void registerDataNormal(MetricResults tempData, boolean includeEmptyRecords, CompiledRestMetricQuery compiledRestMetricQuery) {
+        List<MetricData> data = tempData.getMetricData();
 
 
         Column pathCol = findOrCreateTextColumn("path");
@@ -53,28 +54,53 @@ public class DataMap {
             value = findOrCreateValueColumn(metricName);
             max = findOrCreateValueColumn(metricName+" (max)");
             min =  findOrCreateValueColumn(metricName+ " (min)");
-            sum = findOrCreateValueColumn(metricName+ "(sum)");
-            stdDev = findOrCreateValueColumn(metricName + "(stdDev)");
+            sum = findOrCreateValueColumn(metricName+ " (sum)");
+            stdDev = findOrCreateValueColumn(metricName + " (stdDev)");
 
 
-            for (MetricValues mv : d.getMetricValues()) {
 
-                    for (MetricValue m :mv.getMetricValue()) {
+                    for (MetricValue m :d.getMetricValues()) {
                         String rowKey =  path+"_"+m.getStartTimeInMillis();
                         DataRow dr = _rows.getDataRow(rowKey);
-
                         dr.setTextValue (pathCol,path);
+                        fillPathComponents(d,dr,compiledRestMetricQuery);
+
                         dr.setTimestampValue(timestampCol, new Date(m.getStartTimeInMillis()));
                         dr.setValue(value, m.getValue());
                         dr.setValue(max, m.getMax());
                         dr.setValue(min, m.getMin());
                         dr.setValue(sum, m.getSum());
-                        dr.setValue(stdDev, m.getStdDev());
+                        dr.setValue(stdDev, m.getStandardDeviation());
                     }
+
+            if (includeEmptyRecords) {
+                String rk =  path+"_<empty>";
+                DataRow dr = _rows.getDataRow(rk);
+                dr.setTextValue (pathCol,path);
+
             }
+
         }
 
         _comp = new LongFormatComparator(timestampCol,pathCol);
+
+
+
+    }
+
+    private void fillPathComponents(MetricData d, DataRow dr, CompiledRestMetricQuery compiledRestMetricQuery) {
+
+        int i = 0;
+        for (String e :  d.getMetricPath().split("\\|")) {
+            String pName = compiledRestMetricQuery.getPath().getPathElementName(i);
+            if (pName != null) {
+                TextColumn pcol = findOrCreateTextColumn(pName);
+                dr.setTextValue(pcol,e);
+            }
+
+            i++;
+        }
+
 
 
 
@@ -145,14 +171,14 @@ public class DataMap {
     }
 
 
-    public void registerData(MetricDatas tempData, boolean simplify) {
-        if (!simplify)  registerData(tempData);
-        else registerDataAndSimplify(tempData);
+    public void registerData(MetricResults tempData, boolean simplify, boolean includeEmptyRecords, CompiledRestMetricQuery compiledRestMetricQuery) {
+        if (!simplify)  registerDataNormal(tempData, includeEmptyRecords,compiledRestMetricQuery);
+        else registerDataAndSimplify(tempData,includeEmptyRecords,compiledRestMetricQuery);
 
     }
 
-    public void registerDataAndSimplify(MetricDatas tempData) {
-        ArrayList<MetricData> data = tempData.getMetric_data();
+    public void registerDataAndSimplify(MetricResults tempData, boolean includeEmptyRecords, CompiledRestMetricQuery compiledRestMetricQuery) {
+        List<MetricData> data = tempData.getMetricData();
 
 
         Column metricNameCol = findOrCreateTextColumn(METRIC_NAME);
@@ -178,11 +204,11 @@ public class DataMap {
 
 
 
-            for (MetricValues mv : d.getMetricValues()) {
-
-                for (MetricValue m :mv.getMetricValue()) {
+            for (MetricValue m  : d.getMetricValues()) {
                     String rowKey =  path+"_"+metricName+"_"+m.getStartTimeInMillis();
                     DataRow dr = _rows.getDataRow(rowKey);
+                    fillPathComponents(d,dr,compiledRestMetricQuery);
+
                     dr.setTextValue(metricNameCol,metricName);
                     dr.setTextValue (pathCol,path);
                     dr.setTimestampValue(timestampCol, new Date(m.getStartTimeInMillis()));
@@ -191,8 +217,14 @@ public class DataMap {
                     dr.setValue(max, m.getMax());
                     dr.setValue(min, m.getMin());
                     dr.setValue(sum, m.getSum());
-                    dr.setValue(stdDev, m.getStdDev());
-                }
+                    dr.setValue(stdDev, m.getStandardDeviation());
+            }
+            if (includeEmptyRecords) {
+                String rk =  path+"_"+metricName+"_<empty>";
+                DataRow dr = _rows.getDataRow(rk);
+                dr.setTextValue(metricNameCol,metricName);
+                dr.setTextValue (pathCol,path);
+
             }
         }
 
@@ -206,6 +238,10 @@ public class DataMap {
     public ArrayList<Column> getHeader() {
         return _columns.getColumnsList();
      }
+
+    public void registerData(MetricResults tempData, boolean simplify,CompiledRestMetricQuery compiledRestMetricQuery) {
+        registerData(tempData,simplify,false,compiledRestMetricQuery);
+    }
 
 
     private class SimplifiedComparator implements Comparator<DataRow>{

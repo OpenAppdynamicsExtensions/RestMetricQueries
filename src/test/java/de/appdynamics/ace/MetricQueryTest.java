@@ -53,6 +53,13 @@ public class MetricQueryTest extends TestCase {
     public void testWildCardInPath() {
         execute ("export 'Calls per Minute' from 'Business Transaction Performance'.'Business Transactions'.*.* on Application 'Name'");
     }
+
+    @Test
+    public void testNamedPathElementsPath() {
+        execute ("export 'Calls per Minute' from 'Business Transaction Performance'.'Business Transactions'.* as tierName . * as BT on Application 'Name'");
+    }
+
+
     private static void execute(String test) {
         CharStream input = new ANTLRInputStream(test);
 

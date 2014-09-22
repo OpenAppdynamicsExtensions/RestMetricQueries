@@ -106,35 +106,34 @@ public class MetricQueryCompiler extends MetricQueryBaseVisitor <String>{
 
     @Override
     public String visitDottedPathElements(@NotNull MetricQueryParser.DottedPathElementsContext ctx) {
-        ArrayList<String> list = new ArrayList<String>();
-        _stack.push(list);
         String erg = super.visitDottedPathElements(ctx);
 
-        list = popStack(list.getClass());
         CompiledRestMetricQuery.Path path = peekStack(CompiledRestMetricQuery.Path.class);
 
-        assert (list != null);
         assert (path != null);
-        path.setPathList(list);
         return erg;
     }
 
     @Override
     public String visitPathElement(@NotNull MetricQueryParser.PathElementContext ctx) {
-        ArrayList list = peekStack(ArrayList.class);
-        assert(list != null);
-        if (ctx.elementText != null)    list.add(ctx.elementText);
+        CompiledRestMetricQuery.Path path = peekStack(CompiledRestMetricQuery.Path.class);
+        assert(path != null);
+        if (ctx.elementText != null)    path.addPathElement(ctx.elementText);
 
         String erg = super.visitPathElement(ctx);
-        return erg;
+        MetricQueryParser.PathElementNameContext pe = ctx.pathElementName();
+        if (pe != null) {
+            path.nameCurrentPathElement(pe.getText());
+        }
+     return erg;
     }
 
 
     @Override
     public String visitAnyElement(@NotNull MetricQueryParser.AnyElementContext ctx) {
-        ArrayList list = peekStack(ArrayList.class);
-        assert(list != null);
-        list.add("*");
+        CompiledRestMetricQuery.Path path = peekStack(CompiledRestMetricQuery.Path.class);
+        assert(path != null);
+        path.addPathElement("*");
         return super.visitAnyElement(ctx);
     }
 

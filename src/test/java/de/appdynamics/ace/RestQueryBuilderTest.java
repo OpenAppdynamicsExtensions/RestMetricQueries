@@ -18,8 +18,8 @@ public class RestQueryBuilderTest extends TestCase {
         String q = "export 'Calls per Minute' from " +
                 "'Business Transaction Performance'." +
                 "'Business Transactions'." +
-                "'E-Commerce'.'Checkout'" +
-                "on Application 'Acme Online Book Store'";
+                "'MovieSearchSite'.'/'" +
+                "on Application 'Movie Tickets Online'";
         ArrayList<String> result = executeQuery(q);
 
         ArrayList<String> resultCompare = new ArrayList<String>();
@@ -33,8 +33,8 @@ public class RestQueryBuilderTest extends TestCase {
         String q = "export 'Calls per Minute' from " +
                 "'Business Transaction Performance'." +
                 "'Business Transactions'." +
-                "'E-Commerce'.'Checkout'" +
-                "on Application 'Acme Online Book Store' for 1 day";
+                "'MovieSearchSite'.'/'" +
+                "on Application 'Movie Tickets Online' for 1 day";
         ArrayList<String> result = executeQuery(q);
 
         ArrayList<String> resultCompare = new ArrayList<String>();
@@ -48,7 +48,7 @@ public class RestQueryBuilderTest extends TestCase {
     public void testSimpleQueryPipe () throws MetricParserException {
         String q = "export 'Calls per Minute' from " +
                 "'Business Transaction Performance|Business Transactions|E-Commerce|Checkout'" +
-                "on Application 'Acme Online Book Store'";
+                "on Application 'Movie Tickets Online'";
         ArrayList<String> result = executeQuery(q);
 
         ArrayList<String> resultCompare = new ArrayList<String>();

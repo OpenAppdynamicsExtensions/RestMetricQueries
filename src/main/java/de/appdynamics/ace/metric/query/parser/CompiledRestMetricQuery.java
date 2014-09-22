@@ -1,11 +1,10 @@
 package de.appdynamics.ace.metric.query.parser;
 
 import de.appdynamics.ace.metric.query.data.DataMap;
-import org.appdynamics.appdrestapi.RESTAccess;
-import org.appdynamics.appdrestapi.data.Application;
-import org.appdynamics.appdrestapi.data.Applications;
-import org.appdynamics.appdrestapi.data.MetricDatas;
-import org.appdynamics.appdrestapi.util.TimeRange;
+import de.appdynamics.ace.metric.query.rest.ControllerRestAccess;
+import de.appdynamics.ace.metric.query.rest.MetricResults;
+import de.appdynamics.ace.metric.query.rest.RestException;
+
 
 import java.util.*;
 
@@ -18,6 +17,7 @@ public class CompiledRestMetricQuery {
     private Fields _fields;
     private Path _path;
     private QueryTimeRange _timerange = new QueryTimeRange();
+    private boolean _includeEmptyRecords;
 
     public CompiledRestMetricQuery(String src) {
         _src = src;
@@ -87,7 +87,7 @@ public class CompiledRestMetricQuery {
         return result;
     }
 
-    public DataMap execute(RESTAccess backend) throws QueryException {
+    public DataMap execute(ControllerRestAccess backend) throws QueryException {
         return execute(backend, false);
 
     }
@@ -96,33 +96,36 @@ public class CompiledRestMetricQuery {
         return _timerange;
     }
 
-    private Application findApplication(RESTAccess backend) {
-        Applications apps = backend.getApplications();
 
-        for (Application a : apps.getApplications()) {
-            if (a.getName().equals(getPath().getComponent(PathComponents.APPLICATION))) {
-                return a;
-            }
-        }
-        return null;
-    }
 
-    public DataMap execute(RESTAccess backend, boolean simplify) throws QueryException {
+    public DataMap execute(ControllerRestAccess backend, boolean simplify) throws QueryException {
         DataMap map = new DataMap();
 
 
-        Application a = findApplication(backend);
-        if (a == null) throw new QueryException("Couldn't find Application for root Path :\n" + this);
+
 
         for (String qs : getQueryStrings()) {
-            MetricDatas tempData = backend.getRESTGenericMetricQuery("" + a.getId(), qs
-                    , getTimerange().getStartMilis(), getTimerange().getStopMillis(), isAggregated());
+            try {
+                MetricResults tempData = backend.queryMetrics(getPath().getComponent(PathComponents.APPLICATION), qs
+                        , getTimerange().getStartMilis(), getTimerange().getStopMillis(), isAggregated());
+                map.registerData(tempData,simplify,isIncludeEmptyRecords(),this);
+            } catch (RestException e) {
+                throw new QueryException("Error while Data retrieval :"+e,e);
+            }
 
-            map.registerData(tempData,simplify);
+
 
         }
 
         return map;
+    }
+
+    public void setIncludeEmptyRecords(boolean includeEmptyRecords) {
+        _includeEmptyRecords = includeEmptyRecords;
+    }
+
+    public boolean isIncludeEmptyRecords() {
+        return _includeEmptyRecords;
     }
 
 
@@ -160,17 +163,13 @@ public class CompiledRestMetricQuery {
     public static class Path {
         private ArrayList<String> _pathList = new ArrayList<String>();
         private HashMap<PathComponents, String> _components = new HashMap<PathComponents, String>();
+        private HashMap<String,Integer> _componentNames = new HashMap<String, Integer>();
 
         public void setPathList(ArrayList<String> pathList) {
             _pathList.clear();
+            _componentNames.clear();
             for (String p : pathList) {
-                if (!p.contains("|")) {
-                    _pathList.add(p);
-                } else {
-                    for (String k : p.split("\\|")) {
-                        _pathList.add(k);
-                    }
-                }
+                addPathElement(p);
 
             }
         }
@@ -187,6 +186,11 @@ public class CompiledRestMetricQuery {
 
                 }
                 p.append(s).append("\n");
+            }
+
+            for (String compName : _componentNames.keySet()) {
+                p.append(compName).append(" (").append(_componentNames.get(compName))
+                        .append(") ").append("\n");
             }
 
             p.append("Start Component : \n");
@@ -227,6 +231,32 @@ public class CompiledRestMetricQuery {
 
         public String getComponent(PathComponents key) {
             if (_components.containsKey(key)) return _components.get(key);
+            return null;
+        }
+
+        public void addPathElement(String elementText) {
+            if (!elementText.contains("|")) {
+                _pathList.add(elementText);
+            } else {
+                for (String k : elementText.split("\\|")) {
+                    _pathList.add(k);
+                }
+            }
+        }
+
+        public void nameCurrentPathElement(String name) {
+            int index = _pathList.size();
+            _componentNames.put(name,new Integer(index-1));
+
+        }
+
+        public String getPathElementName(int i) {
+            for (Map.Entry<String,Integer> value:_componentNames.entrySet()) {
+                if (value.getValue().intValue() == i) {
+                    return value.getKey();
+                }
+
+            }
             return null;
         }
     }

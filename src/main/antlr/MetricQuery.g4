@@ -15,7 +15,7 @@
 
 
 
-query  : EXPORT AGGREGATED? exportStatement timeStatement? EOF   ;
+query  : EXPORT METRIC? AGGREGATED? exportStatement timeStatement? EOF   ;
 
 
 
@@ -59,14 +59,16 @@ pathElements : pathElement ( '.' pathElement)*   #dottedPathElements
 
 
 pathElement returns [String elementText]:
-            anyElement
-            |'"' elementName '"' { $elementText = $elementName.text;}
-            |'\'' elementName '\'' { $elementText = $elementName.text;}
+            anyElement  ('as' pathElementName)?
+            |'"' elementName '"' ('as' pathElementName)? { $elementText = $elementName.text;}
+            |'\'' elementName '\'' ('as' pathElementName)? { $elementText = $elementName.text;}
              ;
 
 elementName: ( ~('\\' | '"' | '\''  ) )+;
 
-anyElement : '*';
+pathElementName: ID ;
+
+anyElement : '*'  ;
 
 componentSelection : APPLICATION componentIdentifier # applicationComponentSelection
                    ;
@@ -90,7 +92,9 @@ ANSIDATE : DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT;
 ANSITIME : DIGIT DIGIT  ':' DIGIT DIGIT ':' DIGIT DIGIT;
 TIMEZONE : '(' ('A'..'Z') ('A'..'Z') ('A'..'Z') ')';
 
+
 EXPORT : ('e'|'E') 'xport';
+METRIC : ('m'|'M') 'etric''s'?;
 AGGREGATED : 'aggregated';
 FROM: 'from';
 ON: 'on';
@@ -107,3 +111,4 @@ COMMA : ',' ;
 STAR : '*';
 PLAINSTRING : ~('\"' | '\'');
 APPLICATION : ('a'|'A')'pplication' ;
+ID : (('A'..'Z') | ('a'..'z')) (('A'..'Z') | ('a'..'z') | ('0'..'9'))* ;

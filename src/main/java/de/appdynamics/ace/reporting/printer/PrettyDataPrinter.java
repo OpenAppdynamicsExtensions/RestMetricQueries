@@ -3,7 +3,8 @@ package de.appdynamics.ace.reporting.printer;
 import de.appdynamics.ace.metric.query.data.Column;
 import de.appdynamics.ace.metric.query.data.DataMap;
 import de.appdynamics.ace.metric.query.data.DataRow;
-import org.appdynamics.appdrestapi.RESTAccess;
+import de.appdynamics.ace.metric.query.rest.ControllerRestAccess;
+
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -16,7 +17,7 @@ public class PrettyDataPrinter extends IterativeDataPrinter{
     private int maxColumnLableLength = 0;
 
     @Override
-    public void printData(String query, RESTAccess client, DataMap result, OutputStream os) {
+    public void printData(String query, ControllerRestAccess client, DataMap result, OutputStream os) {
         maxColumnLableLength = 0;
         for (Column c : result.getHeader()) {
             int s = c.getName().length();
@@ -61,7 +62,9 @@ public class PrettyDataPrinter extends IterativeDataPrinter{
           pw.print(c.getName());
         pw.print(" : ");
         fillLine(pw,c.getName().length());
-        pw.print(r.findData(c).getTextValue());
+        if (r.findData(c) != null)
+            pw.print(r.findData(c).getTextValue());
+        else   pw.print("n/a");
         pw.print("\n");
     }
 

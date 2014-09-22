@@ -199,6 +199,19 @@ public class MetricQueryBaseListener implements MetricQueryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterPathElementName(@NotNull MetricQueryParser.PathElementNameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPathElementName(@NotNull MetricQueryParser.PathElementNameContext ctx) { }
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterPathElement(@NotNull MetricQueryParser.PathElementContext ctx) { }
 	/**
 	 * {@inheritDoc}

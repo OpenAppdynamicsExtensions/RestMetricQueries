@@ -115,6 +115,13 @@ public interface MetricQueryVisitor<T> extends ParseTreeVisitor<T> {
 	T visitAbsoluteTimerangeOffset(@NotNull MetricQueryParser.AbsoluteTimerangeOffsetContext ctx);
 
 	/**
+	 * Visit a parse tree produced by {@link MetricQueryParser#pathElementName}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPathElementName(@NotNull MetricQueryParser.PathElementNameContext ctx);
+
+	/**
 	 * Visit a parse tree produced by {@link MetricQueryParser#pathElement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
