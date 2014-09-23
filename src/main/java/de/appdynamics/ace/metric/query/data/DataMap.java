@@ -224,7 +224,7 @@ public class DataMap {
                 DataRow dr = _rows.getDataRow(rk);
                 dr.setTextValue(metricNameCol,metricName);
                 dr.setTextValue (pathCol,path);
-
+                dr.setTimestampValue(timestampCol,new Date(compiledRestMetricQuery.getTimerange().getStopMillis()));
             }
         }
 
