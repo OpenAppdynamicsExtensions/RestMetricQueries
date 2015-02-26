@@ -23,7 +23,7 @@ public class RestQueryBuilderTest extends TestCase {
         ArrayList<String> result = executeQuery(q);
 
         ArrayList<String> resultCompare = new ArrayList<String>();
-        resultCompare.add("Business Transaction Performance|Business Transactions|E-Commerce|Checkout|Calls per Minute");
+        resultCompare.add("Business Transaction Performance|Business Transactions|MovieSearchSite|/|Calls per Minute");
 
         checkResults(resultCompare,result);
 
@@ -38,7 +38,7 @@ public class RestQueryBuilderTest extends TestCase {
         ArrayList<String> result = executeQuery(q);
 
         ArrayList<String> resultCompare = new ArrayList<String>();
-        resultCompare.add("Business Transaction Performance|Business Transactions|E-Commerce|Checkout|Calls per Minute");
+        resultCompare.add("Business Transaction Performance|Business Transactions|MovieSearchSite|/|Calls per Minute");
 
         checkResults(resultCompare,result);
 

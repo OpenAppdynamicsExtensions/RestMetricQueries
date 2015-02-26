@@ -43,4 +43,14 @@ public class MetricData {
     private String _metricName;
     private String _metricPath;
     private List<MetricValue> _metricValues = new ArrayList<MetricValue>();
+
+    public String getMetricId() {
+        return metricId;
+    }
+
+    public void setMetricId(String metricId) {
+        this.metricId = metricId;
+    }
+
+    private String metricId;
 }

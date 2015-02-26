@@ -73,10 +73,11 @@ public class DataMap {
                         dr.setValue(stdDev, m.getStandardDeviation());
                     }
 
-            if (includeEmptyRecords) {
+            if (includeEmptyRecords && d.getMetricValues().size()==0) {
                 String rk =  path+"_<empty>";
                 DataRow dr = _rows.getDataRow(rk);
                 dr.setTextValue (pathCol,path);
+                dr.setTimestampValue(timestampCol,new Date(compiledRestMetricQuery.getTimerange().getStopMillis()));
 
             }
 
@@ -219,7 +220,7 @@ public class DataMap {
                     dr.setValue(sum, m.getSum());
                     dr.setValue(stdDev, m.getStandardDeviation());
             }
-            if (includeEmptyRecords) {
+            if (includeEmptyRecords && d.getMetricValues().size()==0) {
                 String rk =  path+"_"+metricName+"_<empty>";
                 DataRow dr = _rows.getDataRow(rk);
                 dr.setTextValue(metricNameCol,metricName);
