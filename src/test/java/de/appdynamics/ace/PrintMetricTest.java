@@ -22,7 +22,7 @@ public class PrintMetricTest {
             "'Business Transaction Performance'." +
             "'Business Transactions'." +
             "* as tier . * as transaction " +
-            "on Application 'Bundy Online Shoes' for 5 minutes";
+            "on Application 'Fulfillment' for 1 day";
 
     String q3 = "export aggregated * from 'Business Transaction Performance|Business Transactions|*|*' " +
             "on Application 'Bundy Online Shoes' "+
@@ -33,7 +33,7 @@ public class PrintMetricTest {
     public void testAggregatedWildcardQuery() throws MetricParserException, QueryException {
         executeQuery(q,new PrettyDataPrinter(),"Pretty");
 
-        ControllerRestAccess a = new ControllerRestAccess(TestConsts.DEMO_APPDYNAMICS_COM, "80", false, "demouser", "apm13ad3r", "customer1");
+        ControllerRestAccess a = new ControllerRestAccess(TestConsts.DEMO_APPDYNAMICS_COM, "80", false, "demouser", "Ghed7ped0geN", "customer1");
 
         MetricQuery mq = new MetricQuery();
         String query = "export aggregated * " +
@@ -56,17 +56,14 @@ public class PrintMetricTest {
     @Test
     public void testAggregatedWildcardQueryTable() throws MetricParserException, QueryException {
 
-        executeQuery(q,new TableDataPrinter(),"TABLE");
+        executeQuery(q3,new TableDataPrinter(),"TABLE");
 
     }
     @Test
     public void testAggregatedWildcardQueryCMLSimple() throws MetricParserException, QueryException {
         executeQuery(q,new XMLDataPrinter(false),"XML simple");
     }
-    @Test
-    public void testAggregatedWildcardQueryXMLComplex() throws MetricParserException, QueryException {
-        executeQuery(q,new XMLDataPrinter(true),"XML condensed");
-    }
+
 
     private DataMap executeQuery(String query,  DataPrinter printer, String name) throws MetricParserException, QueryException {
         MetricQuery mq = new MetricQuery();
@@ -91,7 +88,7 @@ public class PrintMetricTest {
         };
 
 
-        ControllerRestAccess a = new ControllerRestAccess(TestConsts.DEMO_APPDYNAMICS_COM, "80", false, "demouser", "apm13ad3r", "customer1");
+        ControllerRestAccess a = new ControllerRestAccess(TestConsts.DEMO_APPDYNAMICS_COM, "80", false, "demouser", "Ghed7ped0geN", "customer1");
 
 
         DataMap data = erg.execute(a,printer.isRequireSimplified());
@@ -101,4 +98,10 @@ public class PrintMetricTest {
         System.out.println(":"+output);
         return data;
     }
+    @Test
+    public void testAggregatedWildcardQueryXMLComplex() throws MetricParserException, QueryException {
+        executeQuery(q,new XMLDataPrinter(true),"XML condensed");
+    }
+
+
 }
