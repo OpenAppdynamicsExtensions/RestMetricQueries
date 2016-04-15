@@ -4,6 +4,7 @@ import de.appdynamics.ace.metric.query.parser.CompiledRestMetricQuery;
 import de.appdynamics.ace.metric.query.rest.MetricData;
 import de.appdynamics.ace.metric.query.rest.MetricResults;
 import de.appdynamics.ace.metric.query.rest.MetricValue;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils ;
 
 
@@ -13,7 +14,7 @@ import java.util.*;
 /**
  * Created by stefan.marx on 21.07.14.
  */
-public class DataMap {
+public class DataMap implements Cloneable{
 
     public static final String METRIC_NAME = "metric Name";
     public static final String PATH = "path";
@@ -33,6 +34,25 @@ public class DataMap {
 
     }
 
+    public DataMap(DataMap dataMap) throws CloneNotSupportedException {
+        _rows = (DataRows) dataMap._rows.clone();
+        _columns = (DataColumns) dataMap._columns.clone();
+        _comp = dataMap._comp;
+
+    }
+    private DataMap(DataMap dataMap,DataColumns cols,DataRows rows) throws CloneNotSupportedException {
+        _rows = rows;
+        _columns = cols;
+        _comp = dataMap._comp;
+
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        DataMap dm = new DataMap(this);
+
+        return dm;
+    }
 
     public void registerDataNormal(MetricResults tempData, boolean includeEmptyRecords, CompiledRestMetricQuery compiledRestMetricQuery) {
         List<MetricData> data = tempData.getMetricData();
@@ -52,8 +72,7 @@ public class DataMap {
 
             Column value,max,min,sum,stdDev;
             value = findOrCreateValueColumn(metricName);
-            max = findOrCreateValueColumn(metricName+" (max)");
-            min =  findOrCreateValueColumn(metricName+ " (min)");
+
             sum = findOrCreateValueColumn(metricName+ " (sum)");
             stdDev = findOrCreateValueColumn(metricName + " (stdDev)");
 
@@ -67,8 +86,12 @@ public class DataMap {
 
                         dr.setTimestampValue(timestampCol, new Date(m.getStartTimeInMillis()));
                         dr.setValue(value, m.getValue());
-                        dr.setValue(max, m.getMax());
-                        dr.setValue(min, m.getMin());
+                        if (m.isUseRange()) {
+                            max = findOrCreateValueColumn(metricName+" (max)");
+                            min =  findOrCreateValueColumn(metricName+ " (min)");
+                            dr.setValue(max, m.getMax());
+                            dr.setValue(min, m.getMin());
+                        }
                         dr.setValue(sum, m.getSum());
                         dr.setValue(stdDev, m.getStandardDeviation());
                     }
@@ -210,13 +233,16 @@ public class DataMap {
                     DataRow dr = _rows.getDataRow(rowKey);
                     fillPathComponents(d,dr,compiledRestMetricQuery);
 
-                    dr.setTextValue(metricNameCol,metricName);
                     dr.setTextValue (pathCol,path);
+                    dr.setTextValue(metricNameCol,metricName);
                     dr.setTimestampValue(timestampCol, new Date(m.getStartTimeInMillis()));
 
                     dr.setValue(value, m.getValue());
-                    dr.setValue(max, m.getMax());
-                    dr.setValue(min, m.getMin());
+
+                    if (m.isUseRange()) {
+                        dr.setValue(max, m.getMax());
+                        dr.setValue(min, m.getMin());
+                    }
                     dr.setValue(sum, m.getSum());
                     dr.setValue(stdDev, m.getStandardDeviation());
             }
@@ -244,6 +270,98 @@ public class DataMap {
         registerData(tempData,simplify,false,compiledRestMetricQuery);
     }
 
+    public Column getHeaderColumn(String path) {
+          for (Column c : getHeader()) {
+              if (c.getName().equals(path) ) return c;
+          }
+        return null;
+
+    }
+
+    public List<DataMap> splitBy(Column splitCol) {
+
+        List<DataMap> erg = new ArrayList<DataMap>();
+
+        try {
+            Set<String> values = new HashSet<String>(this.getTextValues(splitCol));
+            for (String value: values) {
+
+                DataRows r = _rows.cloneFiltered(splitCol, value);
+
+                DataMap m = new DataMap(this,(DataColumns) _columns.clone(),r);
+                erg.add(m);
+
+
+            }
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+
+        return erg;
+
+    }
+
+    public List<DataMap> splitBy(List<Column> splitCols) {
+
+        /// NAIVE IMPLEMENTATION
+
+
+
+        List<DataMap> src = new ArrayList<DataMap>();
+        src.add(this);
+        List<DataMap> erg = new ArrayList<DataMap>();
+
+        try {
+            for (Column splitCol:splitCols) {
+                for (DataMap map:src ) {
+                    Set<String> values = new HashSet<String>(this.getTextValues(splitCol));
+                    for (String value : values) {
+
+                        DataRows r = map._rows.cloneFiltered(splitCol, value);
+
+                        DataMap m = new DataMap(map, (DataColumns) map._columns.clone(), r);
+                        erg.add(m);
+
+
+                    }
+                }
+                src = erg;
+                erg = new ArrayList<DataMap>();
+            }
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+
+        return erg;
+
+    }
+
+    public List<DataObject> getValues(Column splitCol) {
+
+        ArrayList<DataObject> erg = new ArrayList<DataObject>();
+        for (DataRow row :_rows.getRows()) {
+            DataObject current = row.getData(splitCol);
+            if (current != null) erg.add(current);
+        }
+
+        return erg;
+    }
+
+    public List<String> getTextValues(Column splitCol) {
+
+        ArrayList<String> erg = new ArrayList<String>();
+        for (DataRow row :_rows.getRows()) {
+            DataObject current = row.getData(splitCol);
+            if (current != null) erg.add(current.getTextValue());
+        }
+
+        return erg;
+    }
+
+    public List<DataMap> splitBy(Column[] columns) {
+        return splitBy(new ArrayList<Column>(Arrays.asList(columns)));
+    }
+
 
     private class SimplifiedComparator implements Comparator<DataRow>{
         private final Column _pathCol;
@@ -260,14 +378,18 @@ public class DataMap {
         public int compare(DataRow o1, DataRow o2) {
             int erg = 0;
 
-            erg = o1.findData(_metricNameCol).getTextValue().compareTo(o2.findData(_metricNameCol).getTextValue());
-            if (erg == 0) {
-                erg = o1.findData(_pathCol).getTextValue().compareTo(o2.findData(_pathCol).getTextValue());
-            }
+            try {
+                erg = o1.findData(_metricNameCol).getTextValue().compareTo(o2.findData(_metricNameCol).getTextValue());
+                if (erg == 0) {
+                    erg = o1.findData(_pathCol).getTextValue().compareTo(o2.findData(_pathCol).getTextValue());
+                }
 
-            if (erg == 0) {
-                erg = ((TimestampDataObject)o1.findData(_timestampCol)).getTimestampValue().compareTo(
-                        ((TimestampDataObject)o2.findData(_timestampCol)).getTimestampValue());
+                if (erg == 0) {
+                    erg = ((TimestampDataObject) o1.findData(_timestampCol)).getTimestampValue().compareTo(
+                            ((TimestampDataObject) o2.findData(_timestampCol)).getTimestampValue());
+                }
+            } catch(Exception ex) {
+                ex.printStackTrace();
             }
 
 

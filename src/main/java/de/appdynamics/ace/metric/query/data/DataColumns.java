@@ -5,9 +5,16 @@ import java.util.*;
 /**
  * Created by stefan.marx on 21.07.14.
  */
-public class DataColumns {
+public class DataColumns implements Cloneable {
     private Map<String, Column> _columnMap = new HashMap<String,Column>();
     private int _nextId = 1;
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        DataColumns r = new DataColumns();
+        r._columnMap = new HashMap<String, Column>(this._columnMap);
+        return r;
+    }
 
     public Column getColumn(String name) {
         if (_columnMap.containsKey(name) ) return _columnMap.get(name);

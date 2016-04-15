@@ -25,7 +25,7 @@ public class PrintMetricTest {
             "on Application 'Fulfillment' for 1 day";
 
     String q3 = "export aggregated * from 'Business Transaction Performance|Business Transactions|*|*' " +
-            "on Application 'Bundy Online Shoes' "+
+            "on Application 'ECommerce' "+
             "for 1 day" ;
 
 
@@ -59,9 +59,16 @@ public class PrintMetricTest {
         executeQuery(q3,new TableDataPrinter(),"TABLE");
 
     }
+
+    @Test
+    public void testPrettyTable() throws MetricParserException, QueryException {
+
+        executeQuery(q3,new PrettyDataPrinter(),"TABLE");
+
+    }
     @Test
     public void testAggregatedWildcardQueryCMLSimple() throws MetricParserException, QueryException {
-        executeQuery(q,new XMLDataPrinter(false),"XML simple");
+        executeQuery(q3,new XMLDataPrinter(true),"XML simple");
     }
 
 
