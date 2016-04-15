@@ -322,7 +322,7 @@ public class DataMap implements Cloneable{
                         DataRows r = map._rows.cloneFiltered(splitCol, value);
 
                         DataMap m = new DataMap(map, (DataColumns) map._columns.clone(), r);
-                        erg.add(m);
+                        if (m._rows.getRows().size()>0) erg.add(m);
 
 
                     }
