@@ -308,11 +308,13 @@ public class DataMap implements Cloneable{
 
 
         List<DataMap> src = new ArrayList<DataMap>();
-        src.add(this);
         List<DataMap> erg = new ArrayList<DataMap>();
+        erg.add(this);
 
         try {
             for (Column splitCol:splitCols) {
+                src = erg;
+                erg = new ArrayList<DataMap>();
                 for (DataMap map:src ) {
                     Set<String> values = new HashSet<String>(this.getTextValues(splitCol));
                     for (String value : values) {
@@ -325,8 +327,7 @@ public class DataMap implements Cloneable{
 
                     }
                 }
-                src = erg;
-                erg = new ArrayList<DataMap>();
+
             }
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
