@@ -124,7 +124,7 @@ task grammarDocu(type: JavaExec, dependsOn: generateGrammarSource) {
 test.testLogging { showStandardStreams = true }
 
 group = 'com.appdynamics.ace.restQuery'
-version = '0.5.1'
+version = '0.5.2'
 
 
 sourceCompatibility=1.6
