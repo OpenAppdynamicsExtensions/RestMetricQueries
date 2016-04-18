@@ -48,7 +48,7 @@ public class SimpleRetrieveTest {
 
         CompiledRestMetricQuery erg = mq.parse( query);
 
-        ControllerRestAccess a = new ControllerRestAccess(TestConsts.DEMO_APPDYNAMICS_COM, "80", false, "demouser", "apm13ad3r", "customer1");
+        ControllerRestAccess a = new ControllerRestAccess(TestConsts.DEMO_APPDYNAMICS_COM, "80", false, "demouser", "Ghed7ped0geN", "customer1");
 
 
         DataMap data = erg.execute(a,condensed);

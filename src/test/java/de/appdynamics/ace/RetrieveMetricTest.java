@@ -20,8 +20,8 @@ public class RetrieveMetricTest  {
         String q = "export 'Calls per Minute' from " +
                 "'Business Transaction Performance'." +
                 "'Business Transactions'." +
-                "'MovieSearchSite'.'/'" +
-                "on Application 'Movie Tickets Online' for 4 hours 1 day ago";
+                "'ECommerce-Services'.'Checkout - Mobile'" +
+                "on Application 'ECommerce' ";
 
         DataMap m = executeQuery(q,true);
        
@@ -32,8 +32,10 @@ public class RetrieveMetricTest  {
         String q = "export * from " +
                 "'Business Transaction Performance'." +
                 "'Business Transactions'." +
-                "'MovieSearchSite'.'/'" +
-                "on Application 'Movie Tickets Online'";
+                "'ECommerce-Services'.'/appdynamicspilot/WEB-INF'" +
+                "on Application 'ECommerce'";
+
+        //Business Transaction Performance|Business Transactions|ECommerce-Services|Checkout - Mobile|Calls per Minute
 
         DataMap m = executeQuery(q,false);
 
@@ -44,8 +46,8 @@ public class RetrieveMetricTest  {
         String q = "export aggregated * from " +
                 "'Business Transaction Performance'." +
                 "'Business Transactions'." +
-                "'MovieSearchSite'.'/'" +
-                "on Application 'Movie Tickets Online'";
+                "'ECommerce-Services'.'/appdynamicspilot/WEB-INF'" +
+                "on Application 'ECommerce'";
 
 
 
@@ -59,7 +61,7 @@ public class RetrieveMetricTest  {
 
         CompiledRestMetricQuery erg = mq.parse( query);
 
-        ControllerRestAccess a = new ControllerRestAccess(TestConsts.DEMO_APPDYNAMICS_COM, "80", false, "demouser", "apm13ad3r", "customer1");
+        ControllerRestAccess a = new ControllerRestAccess(TestConsts.DEMO_APPDYNAMICS_COM, "80", false, "demouser", "Ghed7ped0geN", "customer1");
 
 
         erg.setIncludeEmptyRecords(true);

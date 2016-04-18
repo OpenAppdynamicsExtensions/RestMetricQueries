@@ -65,10 +65,10 @@ public class CompiledRestMetricQuery {
 
         // Simple Use Cases for now
 
-        ArrayList<String> fn = _fields._fieldNames;
+        ArrayList<MetricName> fn = _fields._fieldNames;
         if (_fields.isAll()) {
-            fn = new ArrayList<String>();
-            fn.add("*");
+            fn = new ArrayList<MetricName>();
+            fn.add(new MetricName("*"));
         }
 
         ArrayList<String> pn = getPath().getFullPathComponents();
@@ -78,9 +78,9 @@ public class CompiledRestMetricQuery {
 
 
         for (String base : pn) {
-            for (String field : fn) {
+            for (MetricName field : fn) {
 
-                result.add(base + "|" + field);
+                result.add(base + "|" + field.getName());
             }
         }
 
@@ -102,8 +102,6 @@ public class CompiledRestMetricQuery {
         DataMap map = new DataMap();
 
 
-
-
         for (String qs : getQueryStrings()) {
             try {
                 MetricResults tempData = backend.queryMetrics(getPath().getComponent(PathComponents.APPLICATION), qs
@@ -120,6 +118,21 @@ public class CompiledRestMetricQuery {
         return map;
     }
 
+    public Map<String, String> getQueryMap() {
+        Map<String, String> map = new HashMap<String, String>();
+        // Simple Use Cases for now
+
+        ArrayList<MetricName> fn = _fields._fieldNames;
+
+        if (_fields.isAll()) { return map;}
+
+        for (MetricName field : fn) {
+            if (field.isAliased()) map.put(field.getName(),field.getAlias());
+        }
+
+        return map;
+    }
+
     public void setIncludeEmptyRecords(boolean includeEmptyRecords) {
         _includeEmptyRecords = includeEmptyRecords;
     }
@@ -130,7 +143,7 @@ public class CompiledRestMetricQuery {
 
 
     public static class Fields {
-        private ArrayList<String> _fieldNames = new ArrayList<String>();
+        private ArrayList<MetricName> _fieldNames = new ArrayList<MetricName>();
         private boolean _all;
 
         @Override
@@ -138,6 +151,7 @@ public class CompiledRestMetricQuery {
 
             if (isAll()) return "STAR";
             if (isEmpty()) return "EMPTY";
+
 
             return "FieldList :" + _fieldNames;
         }
@@ -154,7 +168,7 @@ public class CompiledRestMetricQuery {
             _all = all;
         }
 
-        public void setFieldList(ArrayList<String> list) {
+        public void setFieldList(ArrayList<MetricName> list) {
             _fieldNames.clear();
             _fieldNames.addAll(list);
         }

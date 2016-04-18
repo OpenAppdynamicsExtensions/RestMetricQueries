@@ -22,7 +22,7 @@ public class PrintMetricTest {
             "'Business Transaction Performance'." +
             "'Business Transactions'." +
             "* as tier . * as transaction " +
-            "on Application 'Fulfillment' for 1 day";
+            "on Application 'ECommerce' for 1 day";
 
     String q3 = "export aggregated * from 'Business Transaction Performance|Business Transactions|*|*' " +
             "on Application 'ECommerce' "+
@@ -38,7 +38,7 @@ public class PrintMetricTest {
         MetricQuery mq = new MetricQuery();
         String query = "export aggregated * " +
                 "from \"Business Transaction Performance|Business Transactions|*|*\" " +
-                " on Application 'Bundy Online Shoes'\n" +
+                " on Application 'ECommerce'\n" +
                 " for 2 days";
 
         CompiledRestMetricQuery erg = mq.parse( query);

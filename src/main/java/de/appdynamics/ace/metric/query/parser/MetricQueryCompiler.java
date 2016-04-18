@@ -77,7 +77,7 @@ public class MetricQueryCompiler extends MetricQueryBaseVisitor <String>{
 
     @Override
     public String visitMetriclist(@NotNull MetricQueryParser.MetriclistContext ctx) {
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<MetricName> list = new ArrayList<MetricName>();
         _stack.push(list);
         String erg = super.visitMetriclist(ctx);
 
@@ -95,8 +95,15 @@ public class MetricQueryCompiler extends MetricQueryBaseVisitor <String>{
     @Override
     public String visitMetric(@NotNull MetricQueryParser.MetricContext ctx) {
         ArrayList list = peekStack(ArrayList.class);
-        assert(list != null);
-        list.add(ctx.metricName);
+        assert (list != null);
+        MetricName n = new MetricName(ctx.metricName);
+
+        MetricQueryParser.PathElementNameContext pe = ctx.pathElementName();
+        if (pe != null) {
+            n.setAlias(pe.getText());
+        }
+
+        list.add(n);
 
         String erg = super.visitMetric(ctx);
         return erg;
@@ -185,7 +192,7 @@ public class MetricQueryCompiler extends MetricQueryBaseVisitor <String>{
 
         try {
             _compiledQuery.getTimerange().setStartDate(convertToDate(d1));
-            _compiledQuery.getTimerange().setEndDate(convertToDate(d1));
+            _compiledQuery.getTimerange().setEndDate(convertToDate(d2));
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -261,4 +268,5 @@ public class MetricQueryCompiler extends MetricQueryBaseVisitor <String>{
         }
 
     }
+
 }

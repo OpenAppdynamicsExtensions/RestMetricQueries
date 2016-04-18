@@ -17,6 +17,7 @@ import java.util.*;
 public class DataMap implements Cloneable{
 
     public static final String METRIC_NAME = "metric Name";
+    public static final String ALIAS_NAME = "metric alias";
     public static final String PATH = "path";
     public static final String VALUE = "value";
     public static final String MAX = "max";
@@ -57,6 +58,8 @@ public class DataMap implements Cloneable{
     public void registerDataNormal(MetricResults tempData, boolean includeEmptyRecords, CompiledRestMetricQuery compiledRestMetricQuery) {
         List<MetricData> data = tempData.getMetricData();
 
+        Map<String, String> aliasMap = compiledRestMetricQuery.getQueryMap();
+
 
         Column pathCol = findOrCreateTextColumn("path");
         Column timestampCol = findOrCreateTimestampColumn("time");
@@ -68,6 +71,14 @@ public class DataMap implements Cloneable{
            String path = d.getMetricPath();
             String[] elements = path.split("\\|");
             String metricName = elements[elements.length-1];
+
+
+            // Replace with Aliasname if aliased)
+            // To support plain alias definition in metric Queries !!!
+            //----------------------------------------------------------
+            if (aliasMap.containsKey(metricName) ){
+                metricName = aliasMap.get(metricName);
+            }
             path = path.substring(0,path.lastIndexOf("|"));
 
             Column value,max,min,sum,stdDev;
@@ -204,8 +215,17 @@ public class DataMap implements Cloneable{
     public void registerDataAndSimplify(MetricResults tempData, boolean includeEmptyRecords, CompiledRestMetricQuery compiledRestMetricQuery) {
         List<MetricData> data = tempData.getMetricData();
 
+        Map<String, String> aliasMap = compiledRestMetricQuery.getQueryMap();
+
 
         Column metricNameCol = findOrCreateTextColumn(METRIC_NAME);
+
+
+        // Create ALIAS Column if any Aliases defined !!!
+        Column aliasNameCol = null;
+        if (!aliasMap.isEmpty()) aliasNameCol = findOrCreateTextColumn(ALIAS_NAME);
+
+
         Column pathCol = findOrCreateTextColumn(PATH);
         Column timestampCol = findOrCreateTimestampColumn(TIME);
 
@@ -235,7 +255,11 @@ public class DataMap implements Cloneable{
 
                     dr.setTextValue (pathCol,path);
                     dr.setTextValue(metricNameCol,metricName);
-                    dr.setTimestampValue(timestampCol, new Date(m.getStartTimeInMillis()));
+
+                    // if Metric Aliased assign Alias Name
+                    dr.setTextValue(aliasNameCol,aliasMap.get(metricName));
+
+                dr.setTimestampValue(timestampCol, new Date(m.getStartTimeInMillis()));
 
                     dr.setValue(value, m.getValue());
 

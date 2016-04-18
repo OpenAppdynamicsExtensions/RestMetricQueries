@@ -46,8 +46,8 @@ metriclist: metric
             ;
 
 metric returns [String metricName]:
-          '"' metricname '"' {$metricName = $metricname.text;}
-        |'\'' metricname '\'' {$metricName = $metricname.text;}    ;
+          '"' metricname '"' ('as' pathElementName)? {$metricName = $metricname.text;}
+        |'\'' metricname '\'' ('as' pathElementName)? {$metricName = $metricname.text;}    ;
 
 metricname: ( ~('\\'|'"' | '\'') )+;
 
