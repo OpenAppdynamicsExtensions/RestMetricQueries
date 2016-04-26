@@ -1,6 +1,8 @@
 package de.appdynamics.ace.metric.query.rest;
 
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
 import de.appdynamics.ace.metric.query.MetricQueryParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.auth.AuthScope;
@@ -18,7 +20,7 @@ import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.codehaus.jackson.map.ObjectMapper;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,11 +28,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by stefan.marx on 27.08.14.
  */
 public class ControllerRestAccess {
+
+
     public String getPassword() {
         return _password;
     }
@@ -96,10 +102,12 @@ public class ControllerRestAccess {
             InputStream is = executeHttpCall(uri);
 
 
+            com.eclipsesource.json.JsonValue val = Json.parse(new InputStreamReader(is));
 
-            ObjectMapper mapper = new ObjectMapper();
 
-            MetricData[] data = mapper.readValue(is, MetricData[].class);
+
+            MetricData[] data ;
+            data = readJsonData(val);
 
             result.addMetricData(data);
 
@@ -114,6 +122,46 @@ public class ControllerRestAccess {
 
 
         return result;
+    }
+
+    private MetricData[] readJsonData(com.eclipsesource.json.JsonValue val) {
+
+        List<MetricData> dat = new ArrayList<MetricData>();
+
+        JsonArray datas = val.asArray();
+        for (com.eclipsesource.json.JsonValue v : datas.values()) {
+            MetricData d1 = new MetricData();
+            d1.setMetricName(v.asObject().get("metricName").asString());
+            d1.setMetricPath(v.asObject().get("metricPath").asString());
+            d1.setMetricId(""+v.asObject().get("metricId").asLong());
+            d1.setFrequency(v.asObject().get("frequency").asString());
+
+            List<MetricValue> metricValues = new ArrayList<MetricValue>();
+            for (com.eclipsesource.json.JsonValue mv : v.asObject().get("metricValues").asArray()) {
+                MetricValue metricValue = new MetricValue();
+                metricValue.setCount(mv.asObject().get("count").asLong());
+                metricValue.setCurrent(mv.asObject().get("current").asLong());
+                metricValue.setMax(mv.asObject().get("max").asLong());
+                metricValue.setMin(mv.asObject().get("min").asLong());
+                metricValue.setOccurrences(mv.asObject().get("occurrences").asLong());
+                metricValue.setStandardDeviation(mv.asObject().get("standardDeviation").asLong());
+                metricValue.setStartTimeInMillis(mv.asObject().get("startTimeInMillis").asLong());
+                metricValue.setSum(mv.asObject().get("sum").asLong());
+                metricValue.setUseRange(mv.asObject().get("useRange").asBoolean());
+                metricValue.setValue(mv.asObject().get("value").asLong());
+                metricValues.add(metricValue);
+            }
+
+            d1.setMetricValues(metricValues);
+            dat.add(d1);
+
+
+        }
+
+
+
+        return (MetricData[]) dat.toArray(new MetricData[] {});
+
     }
 
     private java.io.InputStream executeHttpCall(URI uri) throws IOException {

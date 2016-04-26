@@ -20,12 +20,18 @@ public class DataRow {
     }
 
     public DataObject getData(Column pathCol) {
-        if (_cols.containsKey(pathCol)) return _cols.get(pathCol);
+        try {
+            if (_cols.containsKey(pathCol)) return _cols.get(pathCol);
 
-        DataObject col = pathCol.constructDataObject();
-        _cols.put(pathCol,col);
 
-        return col;
+            DataObject col = pathCol.constructDataObject();
+            _cols.put(pathCol, col);
+            return col;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+
     }
 
     public DataObject findData(Column pathCol) {

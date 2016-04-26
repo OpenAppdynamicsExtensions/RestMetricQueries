@@ -60,8 +60,9 @@ dependencies {
     compile "org.antlr:antlr4-runtime:4.3"
     antlr4 'org.antlr:antlr4:4.3'
 
-    compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.13'
+    //compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.13'
     compile 'org.apache.httpcomponents:httpclient:4.3.5'
+    compile 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
 
      antlrDoc fileTree(dir: 'lib/antlrDoc', include: '*.jar')
 
@@ -124,7 +125,7 @@ task grammarDocu(type: JavaExec, dependsOn: generateGrammarSource) {
 test.testLogging { showStandardStreams = true }
 
 group = 'com.appdynamics.ace.restQuery'
-version = '0.5.2'
+version = '0.5.4'
 
 
 sourceCompatibility=1.6

@@ -257,7 +257,7 @@ public class DataMap implements Cloneable{
                     dr.setTextValue(metricNameCol,metricName);
 
                     // if Metric Aliased assign Alias Name
-                    dr.setTextValue(aliasNameCol,aliasMap.get(metricName));
+                    if (!aliasMap.isEmpty()) dr.setTextValue(aliasNameCol,aliasMap.get(metricName));
 
                 dr.setTimestampValue(timestampCol, new Date(m.getStartTimeInMillis()));
 
