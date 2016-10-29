@@ -20,12 +20,13 @@ public class MetricQueryParser extends Parser {
 		T__9=1, T__8=2, T__7=3, T__6=4, T__5=5, T__4=6, T__3=7, T__2=8, T__1=9, 
 		T__0=10, NUMBER_NO_LEADING_ZEROS=11, TIME_UNIT=12, ANSIDATE=13, ANSITIME=14, 
 		TIMEZONE=15, EXPORT=16, METRIC=17, AGGREGATED=18, FROM=19, ON=20, WS=21, 
-		COMMA=22, STAR=23, PLAINSTRING=24, APPLICATION=25, ID=26;
+		COMMA=22, STAR=23, PLAINSTRING=24, APPLICATION=25, ID=26, WHERE=27, MATCHES=28;
 	public static final String[] tokenNames = {
 		"<INVALID>", "'ago'", "'as'", "'''", "'\\'", "'ending'", "'at'", "'.'", 
 		"'for'", "'starting'", "'\"'", "NUMBER_NO_LEADING_ZEROS", "TIME_UNIT", 
 		"ANSIDATE", "ANSITIME", "TIMEZONE", "EXPORT", "METRIC", "'aggregated'", 
-		"'from'", "'on'", "WS", "','", "'*'", "PLAINSTRING", "APPLICATION", "ID"
+		"'from'", "'on'", "WS", "','", "'*'", "PLAINSTRING", "APPLICATION", "ID",
+		"'where'", "'matches'"
 	};
 	public static final int
 		RULE_query = 0, RULE_exportStatement = 1, RULE_timeStatement = 2, RULE_timeShiftingStatement = 3, 
@@ -178,6 +179,12 @@ public class MetricQueryParser extends Parser {
 			setState(51); pathSelection();
 			setState(52); match(ON);
 			setState(53); componentSelection();
+			/* This is what I think should happen here
+			setState(54); match(WHERE);
+			setState(55); filteringKeySelection();
+			setState(56); match(MATCHES);
+			setState(57); filteringValueSelection();
+			 */
 			}
 		}
 		catch (RecognitionException re) {
