@@ -42,3 +42,11 @@ public class Main {
     }
 }
 ``` 
+
+A nice little feature was added in the latest release which is called metric aliasing. With this you can specify an alias for the metric you are pulling. This is useful with you want to do further calculations on your metrics and don't want to write the original name all the time (which can be long).
+Please see an example query below using a metric alias (same as the example above just with the aliases):
+
+```
+export 'Calls per Minute' as calls from 'Overall Application Performance' on Application 'Bundy Online Shoes' for 2 days
+
+```
