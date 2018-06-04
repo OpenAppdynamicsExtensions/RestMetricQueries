@@ -7,7 +7,6 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.junit.Test;
 
 import java.util.BitSet;
@@ -68,18 +67,18 @@ public class MetricQueryTest extends TestCase {
         MetricQueryParser parser = new MetricQueryParser(tokens);
         parser.addErrorListener(new ANTLRErrorListener() {
             @Override
-            public void syntaxError(@NotNull Recognizer<?, ?> recognizer, @Nullable Object offendingSymbol, int line, int charPositionInLine, @NotNull String msg, @Nullable RecognitionException e) {
+            public void syntaxError(@NotNull Recognizer<?, ?> recognizer,  Object offendingSymbol, int line, int charPositionInLine, @NotNull String msg,  RecognitionException e) {
                   fail(msg);
             }
 
             @Override
-            public void reportAmbiguity(@NotNull Parser recognizer, @NotNull DFA dfa, int startIndex, int stopIndex, boolean exact, @Nullable BitSet ambigAlts, @NotNull ATNConfigSet configs) {
+            public void reportAmbiguity(@NotNull Parser recognizer, @NotNull DFA dfa, int startIndex, int stopIndex, boolean exact,  BitSet ambigAlts, @NotNull ATNConfigSet configs) {
                 fail("No1");
 
             }
 
             @Override
-            public void reportAttemptingFullContext(@NotNull Parser recognizer, @NotNull DFA dfa, int startIndex, int stopIndex, @Nullable BitSet conflictingAlts, @NotNull ATNConfigSet configs) {
+            public void reportAttemptingFullContext(@NotNull Parser recognizer, @NotNull DFA dfa, int startIndex, int stopIndex,  BitSet conflictingAlts, @NotNull ATNConfigSet configs) {
                 fail("no2");
 
             }

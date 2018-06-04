@@ -252,8 +252,9 @@ public class CompiledRestMetricQuery {
             if (!elementText.contains("|")) {
                 _pathList.add(elementText);
             } else {
+                elementText = elementText.replaceAll("\\\\\\|","####");
                 for (String k : elementText.split("\\|")) {
-                    _pathList.add(k);
+                    _pathList.add(k.replaceAll("####","\\\\\\|"));
                 }
             }
         }
@@ -272,6 +273,10 @@ public class CompiledRestMetricQuery {
 
             }
             return null;
+        }
+
+        public ArrayList<String> getFullQueryPathList() {
+            return _pathList;
         }
     }
 

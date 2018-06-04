@@ -64,7 +64,7 @@ pathElement returns [String elementText]:
             |'\'' elementName '\'' ('as' pathElementName)? { $elementText = $elementName.text;}
              ;
 
-elementName: ( ~('\\' | '"' | '\''  ) )+;
+elementName: ( ~( '"' | '\''  ) )+;
 
 pathElementName: ID ;
 

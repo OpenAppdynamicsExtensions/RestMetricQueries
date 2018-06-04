@@ -125,18 +125,66 @@ public class DataMap implements Cloneable{
 
     private void fillPathComponents(MetricData d, DataRow dr, CompiledRestMetricQuery compiledRestMetricQuery) {
 
-        int i = 0;
-        for (String e :  d.getMetricPath().split("\\|")) {
+//        int i = 0;
+//        for (String e :  d.getMetricPath().split("\\|")) {
+//            String pName = compiledRestMetricQuery.getPath().getPathElementName(i);
+//            if (pName != null) {
+//                TextColumn pcol = findOrCreateTextColumn(pName);
+//                dr.setTextValue(pcol,e);
+//            }
+//
+//            i++;
+//        }
+
+        String fullMetricPath = d.getMetricPath();
+        ArrayList<String> components = compiledRestMetricQuery.getPath().getFullQueryPathList();
+
+        for (int i = 0; i < components.size();i++) {
+            String pathComponent = components.get(i);
+            String nextPathComponent = ((i+1)<components.size())?components.get(i+1):null;
             String pName = compiledRestMetricQuery.getPath().getPathElementName(i);
-            if (pName != null) {
-                TextColumn pcol = findOrCreateTextColumn(pName);
-                dr.setTextValue(pcol,e);
+            System.out.println(":"+ compiledRestMetricQuery.getPath().getPathElementName(i));
+            System.out.println("Mapp to "+pName);
+            if (pathComponent.equals("*")) {
+                if (nextPathComponent != null) {
+                    if (fullMetricPath.contains(nextPathComponent)) {
+                        String[] splitList = fullMetricPath.split(nextPathComponent);
+
+                        String mValue = splitList[0].substring(0,splitList[0].length()-1);
+                        if (pName != null) {
+                            TextColumn pcol = findOrCreateTextColumn(pName);
+                            dr.setTextValue(pcol, mValue);
+                        }
+
+                        //consume
+                        String metric = nextPathComponent;
+                        for (int j = 1; j < splitList.length; j++) {
+                            metric = metric + splitList[j];
+                        }
+                        fullMetricPath = metric;
+
+                    }
+                } else {
+                    if (pName != null) {
+                        TextColumn pcol = findOrCreateTextColumn(pName);
+                        dr.setTextValue(pcol, fullMetricPath);
+                    }
+                    fullMetricPath = "";
+                }
+
+            } else {
+                if (fullMetricPath.startsWith(pathComponent)) {
+
+                    if (pName != null) {
+                        TextColumn pcol = findOrCreateTextColumn(pName);
+                        dr.setTextValue(pcol, pName);
+                    }
+                    // consume
+                    fullMetricPath = fullMetricPath.substring(pathComponent.length()+1);
+                }
             }
 
-            i++;
         }
-
-
 
 
     }
@@ -187,6 +235,7 @@ public class DataMap implements Cloneable{
                 if (ob == null) sb.append(StringUtils.center("---",12,' ')).append ("|");
                 else  {
                     if (c.equals(pathCol)) sb.append(StringUtils.center(ob.getTextValue().replace("|",":-:") ,12,' ')).append ("|");
+                    else if (ob.getTextValue().contains("|")) sb.append(StringUtils.center(ob.getTextValue().replace("|","."),12,' ')).append("|");
                     else sb.append(StringUtils.center(ob.getTextValue() ,12,' ')).append("|");
 
                 }

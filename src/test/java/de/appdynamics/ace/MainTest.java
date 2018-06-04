@@ -39,6 +39,11 @@ public class MainTest {
 
     public static void testAggregatedWildcardQueryTable() throws MetricParserException, QueryException {
 
+        String q = "export aggregated 'Average Response Time (ms)' from " +
+                "'Business Transaction Performance'." +
+                "'Business Transactions'." +
+                "* as tier . * as transaction " +
+                "on Application 'Fulfillment' for 1 day";
         executeQuery(q,new TableDataPrinter(),"TABLE");
 
     }

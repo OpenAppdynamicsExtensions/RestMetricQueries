@@ -18,7 +18,8 @@ apply plugin: 'maven-publish'
 ext.antlr = [
         grammarpackage: "de.appdynamics.ace.metric.query",
         antlrSource: 'src/main/antlr',
-        destinationDir: "src/main/java"
+        destinationDir: "src/main/java",
+        destinationDirJS: "src/main/js"
 ]
 
 configurations {
@@ -57,8 +58,8 @@ dependencies {
     // compile "com.appdynamics:rest-api:1.0.9"
     compile 'org.apache.commons:commons-lang3:3.3.2'
 
-    compile "org.antlr:antlr4-runtime:4.3"
-    antlr4 'org.antlr:antlr4:4.3'
+    compile "org.antlr:antlr4-runtime:4.5.3"
+    antlr4 'org.antlr:antlr4:4.5.3'
 
     //compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.13'
     compile 'org.apache.httpcomponents:httpclient:4.3.5'
@@ -82,6 +83,22 @@ task generateGrammarSource( type: JavaExec) {
     classpath = configurations.antlr4
     def pkg = antlr.grammarpackage.replaceAll("\\.", "/")
     args = ["-o", "${antlr.destinationDir}/${pkg}"/*, "-atn"*/, "-visitor", "-package", antlr.grammarpackage, grammars.files].flatten()
+
+}
+
+task generateGrammarJavascriptSource( type: JavaExec) {
+    description = 'Generates Java sources from ANTLR4 grammars.'
+
+    inputs.dir file(antlr.antlrSource)
+    outputs.dir file(antlr.destinationDirJS)
+
+    def grammars = fileTree(antlr.antlrSource).include('**/*.g4')
+
+    main = 'org.antlr.v4.Tool'
+    classpath = configurations.antlr4
+    def pkg = antlr.grammarpackage.replaceAll("\\.", "/")
+    systemProperties += [language:'JavaScript']
+    args = ["-Dlanguage=JavaScript","-o", "${antlr.destinationDirJS}/${pkg}", "-visitor", "-package", antlr.grammarpackage, grammars.files].flatten()
 
 }
 
@@ -125,7 +142,7 @@ task grammarDocu(type: JavaExec, dependsOn: generateGrammarSource) {
 test.testLogging { showStandardStreams = true }
 
 group = 'com.appdynamics.ace.restQuery'
-version = '0.5.4'
+version = '0.6.1'
 
 
 sourceCompatibility=1.6
